@@ -20,6 +20,8 @@ export class App3D {
       this._renderer.render( this._scene, this._camera);
     })
 
+    this._renderer.setSize( window.innerWidth, window.innerHeight );
+
   }
 
 }
