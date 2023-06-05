@@ -1,23 +1,21 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { ref, onMounted } from 'vue';
+import { createApp3D } from './app-3d/createApp3D';
+let app3dCanvas = ref< HTMLCanvasElement | null >(null);
+
+onMounted(() => {
+  if( app3dCanvas.value ) {
+    let app3d = createApp3D( app3dCanvas.value );
+    app3d.initiate();
+  }
+})
+
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <div>
+    <canvas ref="app3dCanvas" class="app-3d"></canvas>
+  </div>
 </template>
 
 <style scoped>
