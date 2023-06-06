@@ -27,10 +27,24 @@ describe( 'initiating', () => {
 
   })
 
-  it( 'should resize renderer when enable', () => {
+  describe('resizing', () => {
+    it( 'should resize renderer', () => {
 
-    expect( renderer.setSize ).toHaveBeenCalledWith( window.innerWidth, window.innerHeight )
-  
+      expect( renderer.setSize ).toHaveBeenCalledWith( window.innerWidth, window.innerHeight )
+      
+    })
+    
+    it('should also resize renderer when window resize', () => {
+      
+      const newSize = [ 1920, 1080 ];
+
+      [ window.innerWidth,  window.innerHeight ] = newSize;
+      
+      window.dispatchEvent(new CustomEvent('resize'))
+      
+      expect( renderer.setSize ).toHaveBeenLastCalledWith( ...newSize )
+      
+    })
   })
 
 } )

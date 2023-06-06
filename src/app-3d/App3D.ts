@@ -20,8 +20,22 @@ export class App3D {
       this._renderer.render( this._scene, this._camera);
     })
 
-    this._renderer.setSize( window.innerWidth, window.innerHeight );
+    this._initResizing();
 
+  }
+
+  private _initResizing() {
+    this._resizeRenderer();
+
+    window.addEventListener('resize', () => {
+
+      this._resizeRenderer();
+
+    })
+  }
+
+  private _resizeRenderer() {
+    this._renderer.setSize( window.innerWidth, window.innerHeight );
   }
 
 }
