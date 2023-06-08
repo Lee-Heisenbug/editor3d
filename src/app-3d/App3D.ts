@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Scene, WebGLRenderer } from 'three'
+import { AmbientLight, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
 
 export class App3D {
 
@@ -22,6 +22,8 @@ export class App3D {
 
     this._initResizing();
 
+    this._constructScene();
+
   }
 
   private _initResizing() {
@@ -36,6 +38,10 @@ export class App3D {
 
   private _resizeRenderer() {
     this._renderer.setSize( window.innerWidth, window.innerHeight );
+  }
+
+  private _constructScene() {
+    this._scene.add( new AmbientLight() )
   }
 
 }

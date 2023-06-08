@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest'
 import { App3D } from '../App3D';
-import { PerspectiveCamera, Scene, WebGLRenderer } from 'three';
+import { AmbientLight, PerspectiveCamera, Scene, WebGLRenderer } from 'three';
 
 const renderer = new WebGLRenderer();
 const scene = new Scene();
@@ -11,6 +11,7 @@ const app = new App3D( scene, camera, renderer );
 describe( 'initiating', () => {
 
   const rendererSpy = vi.spyOn(renderer, 'setAnimationLoop');
+  const sceneSpy = vi.spyOn( scene, 'add' );
 
   beforeAll(() => {
     window.innerHeight = 600;
@@ -47,6 +48,14 @@ describe( 'initiating', () => {
     })
   })
 
+  describe('constructing scene', () => {
+
+    it('should has an ambient light', () => {
+      expect( ( <AmbientLight>sceneSpy.mock.calls[0][0] ).isAmbientLight ).toBe( true );
+    })
+
+  })
+
 } )
 
 vi.mock('three', () => {
@@ -57,13 +66,18 @@ vi.mock('three', () => {
   WebGLRenderer.prototype.setSize = vi.fn();
 
   const Scene = vi.fn();
+  Scene.prototype.add = vi.fn();
 
   const PerspectiveCamera = vi.fn();
+
+  const AmbientLight = vi.fn();
+  AmbientLight.prototype.isAmbientLight = true;
 
   return {
     WebGLRenderer,
     Scene,
-    PerspectiveCamera
+    PerspectiveCamera,
+    AmbientLight
   }
 
 });
