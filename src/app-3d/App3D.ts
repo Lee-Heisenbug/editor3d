@@ -1,16 +1,22 @@
-import { AmbientLight, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
+import { AmbientLight, Object3D, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
+
+export interface ModelLoader {
+  load( cb: ( model: Object3D ) => void ): void;
+}
 
 export class App3D {
 
   private _scene: Scene;
   private _camera: PerspectiveCamera;
   private _renderer: WebGLRenderer;
+  private _modelLoader: ModelLoader;
 
-  constructor( scene: Scene, camera: PerspectiveCamera, renderer: WebGLRenderer ) {
+  constructor( scene: Scene, camera: PerspectiveCamera, renderer: WebGLRenderer, modelLoader: ModelLoader ) {
 
     this._scene = scene;
     this._camera = camera;
     this._renderer = renderer;
+    this._modelLoader = modelLoader
 
   }
 
@@ -23,6 +29,8 @@ export class App3D {
     this._initResizing();
 
     this._constructScene();
+
+    this._loadModel();
 
   }
 
@@ -42,6 +50,14 @@ export class App3D {
 
   private _constructScene() {
     this._scene.add( new AmbientLight() )
+  }
+
+  private _loadModel() {
+    this._modelLoader.load( ( model ) => {
+
+      this._scene.add( model );
+
+    })
   }
 
 }

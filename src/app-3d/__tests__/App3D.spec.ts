@@ -1,12 +1,32 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest'
 import { App3D } from '../App3D';
-import { AmbientLight, PerspectiveCamera, Scene, WebGLRenderer } from 'three';
+import type { ModelLoader } from '../App3D'
+import { AmbientLight, Object3D, PerspectiveCamera, Scene, WebGLRenderer } from 'three';
+
+class ModelLoaderTest implements ModelLoader {
+
+  loadedModel = new Object3D();
+  loadedCall = () => {}
+
+  constructor() {
+
+  }
+
+  load( cb: ( model: Object3D ) => void ) {
+
+    this.loadedCall = () => { cb( this.loadedModel) };
+
+  }
+
+}
+
 
 const renderer = new WebGLRenderer();
 const scene = new Scene();
 const camera = new PerspectiveCamera();
+const modelLoader = new ModelLoaderTest();
 
-const app = new App3D( scene, camera, renderer );
+const app = new App3D( scene, camera, renderer, modelLoader );
 
 describe( 'initiating', () => {
 
@@ -56,6 +76,22 @@ describe( 'initiating', () => {
 
   })
 
+  describe('loading model', () => {
+
+    
+    beforeAll(() => {
+      sceneSpy.mockClear();
+      modelLoader.loadedCall();
+    })
+
+    it('should add loadded model to scene when model loaded', () => {
+
+      expect( sceneSpy ).toHaveBeenCalledWith( modelLoader.loadedModel )
+
+    })
+
+  })
+
 } )
 
 vi.mock('three', () => {
@@ -73,11 +109,14 @@ vi.mock('three', () => {
   const AmbientLight = vi.fn();
   AmbientLight.prototype.isAmbientLight = true;
 
+  const Object3D = vi.fn();
+
   return {
     WebGLRenderer,
     Scene,
     PerspectiveCamera,
-    AmbientLight
+    AmbientLight,
+    Object3D
   }
 
 });
