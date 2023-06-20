@@ -1,6 +1,7 @@
 import { PerspectiveCamera, Scene, WebGLRenderer } from "three";
 import { App3D } from "./App3D";
-import { ModelLoaderImp } from "./ModelLoaderImp";
+import { GLTFModelLoader } from "./app3d-imp/GLTFModelLoader";
+import { RendererAndCameraResizer } from "./app3d-imp/RendererAndCameraResizer";
 
 export function createApp3D(canvas: HTMLCanvasElement) {
 
@@ -10,8 +11,9 @@ export function createApp3D(canvas: HTMLCanvasElement) {
   });
   const camera = new PerspectiveCamera();
   camera.position.set(0, 0, 20)
-  const modelLoader = new ModelLoaderImp();
+  const modelLoader = new GLTFModelLoader();
+  const resizer = new RendererAndCameraResizer( renderer, camera );
 
-  return new App3D( scene, camera, renderer, modelLoader );
+  return new App3D( scene, camera, renderer, modelLoader, resizer );
 
 }

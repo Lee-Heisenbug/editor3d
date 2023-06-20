@@ -4,19 +4,30 @@ export interface ModelLoader {
   load( cb: ( model: Object3D ) => void ): void;
 }
 
+export interface Resizer {
+  setSize( size: Size ): void;
+}
+
+export interface Size {
+  width: number,
+  height: number
+}
+
 export class App3D {
 
   private _scene: Scene;
   private _camera: PerspectiveCamera;
   private _renderer: WebGLRenderer;
   private _modelLoader: ModelLoader;
+  private _resizer: Resizer;
 
-  constructor( scene: Scene, camera: PerspectiveCamera, renderer: WebGLRenderer, modelLoader: ModelLoader ) {
+  constructor( scene: Scene, camera: PerspectiveCamera, renderer: WebGLRenderer, modelLoader: ModelLoader, resizer: Resizer ) {
 
     this._scene = scene;
     this._camera = camera;
     this._renderer = renderer;
     this._modelLoader = modelLoader
+    this._resizer = resizer;
 
   }
 
@@ -35,17 +46,20 @@ export class App3D {
   }
 
   private _initResizing() {
-    this._resizeRenderer();
+    this._resize();
 
     window.addEventListener('resize', () => {
 
-      this._resizeRenderer();
+      this._resize();
 
     })
   }
 
-  private _resizeRenderer() {
-    this._renderer.setSize( window.innerWidth, window.innerHeight );
+  private _resize() {
+    this._resizer.setSize({
+      width: window.innerWidth,
+      height: window.innerHeight
+    })
   }
 
   private _constructScene() {

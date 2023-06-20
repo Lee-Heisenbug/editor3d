@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest'
 import { App3D } from '../App3D';
-import type { ModelLoader } from '../App3D'
+import type { ModelLoader, Resizer, Size } from '../App3D'
 import { AmbientLight, Object3D, PerspectiveCamera, Scene, WebGLRenderer } from 'three';
 
 class ModelLoaderTest implements ModelLoader {
@@ -20,13 +20,21 @@ class ModelLoaderTest implements ModelLoader {
 
 }
 
+class ResizerTest implements Resizer {
+  size: Size | null = null;
+  setSize(size: Size) {
+    this.size = size;
+  }
+}
+
 
 const renderer = new WebGLRenderer();
 const scene = new Scene();
 const camera = new PerspectiveCamera();
 const modelLoader = new ModelLoaderTest();
+const resizer = new ResizerTest();
 
-const app = new App3D( scene, camera, renderer, modelLoader );
+const app = new App3D( scene, camera, renderer, modelLoader, resizer );
 
 describe( 'initiating', () => {
 
@@ -49,9 +57,12 @@ describe( 'initiating', () => {
   })
 
   describe('resizing', () => {
-    it( 'should resize renderer', () => {
+    it( 'should resize on initiation', () => {
 
-      expect( renderer.setSize ).toHaveBeenCalledWith( window.innerWidth, window.innerHeight )
+      expect( resizer.size ).toEqual({
+        width: window.innerWidth,
+        height: window.innerHeight
+      })
       
     })
     
@@ -63,9 +74,13 @@ describe( 'initiating', () => {
       
       window.dispatchEvent(new CustomEvent('resize'))
       
-      expect( renderer.setSize ).toHaveBeenLastCalledWith( ...newSize )
-      
+      expect( resizer.size ).toEqual({
+        width: window.innerWidth,
+        height: window.innerHeight
+      })
+
     })
+
   })
 
   describe('constructing scene', () => {
