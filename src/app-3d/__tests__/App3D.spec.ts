@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest'
 import { App3D } from '../App3D';
-import type { ModelLoader, Resizer, Size } from '../App3D'
-import { AmbientLight, Object3D, PerspectiveCamera, Scene, WebGLRenderer } from 'three';
+import type { CameraControl, ModelLoader, Resizer, Size } from '../App3D'
+import { AmbientLight, Camera, Object3D, PerspectiveCamera, Scene, WebGLRenderer } from 'three';
 
 class ModelLoaderTest implements ModelLoader {
 
@@ -27,14 +27,25 @@ class ResizerTest implements Resizer {
   }
 }
 
+class CameraControlTest implements CameraControl {
+  camera: Camera | null = null;
+  dom: HTMLElement | null = null;
+  initiate( camera: Camera, dom: HTMLElement ) {
+    this.camera = camera;
+    this.dom = dom;
+  }
+}
+
 
 const renderer = new WebGLRenderer();
+renderer.domElement = document.createElement('canvas');
 const scene = new Scene();
 const camera = new PerspectiveCamera();
 const modelLoader = new ModelLoaderTest();
 const resizer = new ResizerTest();
+const cameraControl = new CameraControlTest();
 
-const app = new App3D( scene, camera, renderer, modelLoader, resizer );
+const app = new App3D( scene, camera, renderer, modelLoader, resizer, cameraControl );
 
 describe( 'initiating', () => {
 
@@ -66,7 +77,7 @@ describe( 'initiating', () => {
       
     })
     
-    it('should also resize renderer when window resize', () => {
+    it('should also resize when window resize', () => {
       
       const newSize = [ 1920, 1080 ];
 
@@ -105,6 +116,13 @@ describe( 'initiating', () => {
 
     })
 
+  })
+
+  describe('camera control', () => {
+    it('should initiate camera control', () => {
+      expect( cameraControl.camera ).toBe( camera );
+      expect( cameraControl.dom ).toBe( renderer.domElement )
+    })
   })
 
 } )
