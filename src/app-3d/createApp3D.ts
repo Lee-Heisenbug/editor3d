@@ -6,6 +6,7 @@ import { CameraControlImp } from './app3d-imp/CameraControlImp'
 import carModelSrc from './mp44.glb'
 import garageModelSrc from './garage.glb'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { GridAdder } from './app3d-imp/GridAdder'
 
 export function createApp3D(canvas: HTMLCanvasElement) {
   const scene = new Scene()
@@ -18,6 +19,7 @@ export function createApp3D(canvas: HTMLCanvasElement) {
   const modelLoader = new GLTFModelLoader([carModelSrc, garageModelSrc], gltfLoader)
   const resizer = new RendererAndCameraResizer(renderer, camera)
   const cameraControl = new CameraControlImp()
+  const gridAdder = new GridAdder()
 
-  return new App3D(scene, camera, renderer, modelLoader, resizer, cameraControl)
+  return new App3D(scene, camera, renderer, modelLoader, resizer, cameraControl, gridAdder)
 }

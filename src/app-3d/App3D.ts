@@ -17,6 +17,16 @@ export interface Size {
   height: number
 }
 
+export interface Infra {
+  scene: Scene
+  camera: PerspectiveCamera
+  renderer: WebGLRenderer
+}
+
+export interface Initiator {
+  initiate(infra: Infra): void
+}
+
 export class App3D {
   private _scene: Scene
   private _camera: PerspectiveCamera
@@ -24,6 +34,7 @@ export class App3D {
   private _modelLoader: ModelLoader
   private _resizer: Resizer
   private _cameraControl: CameraControl
+  private _initiator: Initiator
 
   constructor(
     scene: Scene,
@@ -31,7 +42,8 @@ export class App3D {
     renderer: WebGLRenderer,
     modelLoader: ModelLoader,
     resizer: Resizer,
-    cameraControl: CameraControl
+    cameraControl: CameraControl,
+    initiator: Initiator
   ) {
     this._scene = scene
     this._camera = camera
@@ -39,6 +51,7 @@ export class App3D {
     this._modelLoader = modelLoader
     this._resizer = resizer
     this._cameraControl = cameraControl
+    this._initiator = initiator
   }
 
   initiate() {
@@ -53,6 +66,12 @@ export class App3D {
     this._loadModel()
 
     this._cameraControl.initiate(this._camera, this._renderer.domElement)
+
+    this._initiator.initiate({
+      scene: this._scene,
+      camera: this._camera,
+      renderer: this._renderer
+    })
   }
 
   private _initResizing() {

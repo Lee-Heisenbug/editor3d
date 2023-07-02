@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest'
 import { App3D } from '../App3D'
-import type { CameraControl, ModelLoader, Resizer, Size } from '../App3D'
+import type { CameraControl, ModelLoader, Resizer, Size, Initiator, Infra } from '../App3D'
 import { AmbientLight, Camera, Object3D, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
 
 class ModelLoaderTest implements ModelLoader {
@@ -32,6 +32,17 @@ class CameraControlTest implements CameraControl {
   }
 }
 
+class InitiatorTest implements Initiator {
+  camera: Camera | null = null
+  scene: Scene | null = null
+  renderer: WebGLRenderer | null = null
+  initiate({ scene, camera, renderer }: Infra) {
+    this.scene = scene
+    this.camera = camera
+    this.renderer = renderer
+  }
+}
+
 const renderer = new WebGLRenderer()
 renderer.domElement = document.createElement('canvas')
 const scene = new Scene()
@@ -39,8 +50,9 @@ const camera = new PerspectiveCamera()
 const modelLoader = new ModelLoaderTest()
 const resizer = new ResizerTest()
 const cameraControl = new CameraControlTest()
+const initiator = new InitiatorTest()
 
-const app = new App3D(scene, camera, renderer, modelLoader, resizer, cameraControl)
+const app = new App3D(scene, camera, renderer, modelLoader, resizer, cameraControl, initiator)
 
 describe('initiating', () => {
   const rendererSpy = vi.spyOn(renderer, 'setAnimationLoop')
@@ -103,6 +115,12 @@ describe('initiating', () => {
       expect(cameraControl.camera).toBe(camera)
       expect(cameraControl.dom).toBe(renderer.domElement)
     })
+  })
+
+  it('should initiate via initiator', () => {
+    expect(initiator.scene).toBe(scene)
+    expect(initiator.camera).toBe(camera)
+    expect(initiator.renderer).toBe(renderer)
   })
 })
 
