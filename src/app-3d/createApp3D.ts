@@ -7,6 +7,8 @@ import carModelSrc from './mp44.glb'
 import garageModelSrc from './garage.glb'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { GridAdder } from './app3d-imp/GridAdder'
+import { InitiatorComposite } from './app3d-imp/InitiatorComposite'
+import { ObjectScaleInitiator } from './app3d-imp/ObjectScaleInitiator'
 
 export function createApp3D(canvas: HTMLCanvasElement) {
   const scene = new Scene()
@@ -21,5 +23,13 @@ export function createApp3D(canvas: HTMLCanvasElement) {
   const cameraControl = new CameraControlImp()
   const gridAdder = new GridAdder()
 
-  return new App3D(scene, camera, renderer, modelLoader, resizer, cameraControl, gridAdder)
+  return new App3D(
+    scene,
+    camera,
+    renderer,
+    modelLoader,
+    resizer,
+    cameraControl,
+    new InitiatorComposite([gridAdder, new ObjectScaleInitiator()])
+  )
 }
