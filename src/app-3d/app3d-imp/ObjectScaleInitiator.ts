@@ -18,6 +18,7 @@ export class ObjectScaleInitiator implements Initiator {
     const boxHelper = new IntersectionIgnoreBox3Helper(box)
     const boundingBox = new BoundingBoxThree(boxHelper)
 
+    boxHelper.visible = false
     infra.scene.add(boxHelper)
 
     const objectScale = new ObjectScale(
