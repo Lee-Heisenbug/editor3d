@@ -2,7 +2,7 @@ import { Box3, Box3Helper, Raycaster } from 'three'
 import type { Infra, Initiator } from '../App3D'
 import { ObjectScale } from '../ObjectScale'
 import { MouseDOMImp } from '../object-scale-imp/MouseDOMImp'
-import { SceneThreeImp } from '../object-scale-imp/SceneThreeImp'
+import { BoundingBoxThree, ScaleWidgetImp, SceneThreeImp } from '../object-scale-imp/SceneThreeImp'
 
 class IntersectionIgnoreBox3Helper extends Box3Helper {
   raycast(): void {
@@ -16,16 +16,15 @@ export class ObjectScaleInitiator implements Initiator {
     const raycaster = new Raycaster()
     const box = new Box3()
     const boxHelper = new IntersectionIgnoreBox3Helper(box)
+    const boundingBox = new BoundingBoxThree(boxHelper)
+
+    infra.scene.add(boxHelper)
+
     const objectScale = new ObjectScale(
       new MouseDOMImp(infra.renderer.domElement),
-      new SceneThreeImp(
-        infra.scene,
-        infra.camera,
-        infra.renderer.domElement,
-        raycaster,
-        box,
-        boxHelper
-      )
+      new SceneThreeImp(infra.scene, infra.camera, infra.renderer.domElement, raycaster),
+      new ScaleWidgetImp(),
+      boundingBox
     )
 
     objectScale.initiate()

@@ -4,36 +4,24 @@ import {
   type Raycaster,
   type Scene as SceneThree,
   Object3D,
-  Box3,
-  Box3Helper
+  Box3Helper,
+  type Event,
+  Vector3
 } from 'three'
-import type { MousePosition, Object, Scene } from '../ObjectScale'
+import type { MousePosition, BoundingBox, Scene, ScaleWidget } from '../ObjectScale'
 
 export class SceneThreeImp implements Scene {
   private _scene: SceneThree
   private _camera: Camera
   private _dom: HTMLCanvasElement
   private _raycaster: Raycaster
-  private _box: Box3
-  private _boxHelper: Box3Helper
-  constructor(
-    scene: SceneThree,
-    camera: Camera,
-    dom: HTMLCanvasElement,
-    raycaster: Raycaster,
-    box: Box3,
-    boxHelper: Box3Helper
-  ) {
+  constructor(scene: SceneThree, camera: Camera, dom: HTMLCanvasElement, raycaster: Raycaster) {
     this._scene = scene
     this._camera = camera
     this._dom = dom
     this._raycaster = raycaster
-    this._box = box
-    this._boxHelper = boxHelper
-    this._scene.add(this._boxHelper)
-    this._boxHelper.visible = false
   }
-  selectObject(mousePosition: MousePosition): Object {
+  selectObject(mousePosition: MousePosition) {
     const clipPos = new Vector2(
       (mousePosition[0] / this._dom.width - 0.5) / 0.5,
       -(mousePosition[1] / this._dom.height - 0.5) / 0.5
@@ -43,35 +31,28 @@ export class SceneThreeImp implements Scene {
     const intersection = this._raycaster.intersectObject(this._scene)
 
     if (intersection[0]) {
-      return new ObjectThreeImp(intersection[0].object, this._box, this._boxHelper)
+      return intersection[0].object
+    } else {
+      return null
     }
-
-    return new EmptyObject(this._boxHelper)
   }
 }
 
-class EmptyObject implements Object {
+export class BoundingBoxThree implements BoundingBox {
   private _boxHelper: Box3Helper
   constructor(boxHelper: Box3Helper) {
     this._boxHelper = boxHelper
   }
-  showBoundingBox(): void {
-    this._boxHelper.visible = false
+  set visible(val: boolean) {
+    this._boxHelper.visible = val
+  }
+  update(object: Object3D<Event>): void {
+    this._boxHelper.box.makeEmpty()
+    this._boxHelper.box.expandByObject(object)
   }
 }
 
-class ObjectThreeImp implements Object {
-  private _object3D: Object3D
-  private _box: Box3
-  private _boxHelper: Box3Helper
-  constructor(object3D: Object3D, box: Box3, boxHelper: Box3Helper) {
-    this._object3D = object3D
-    this._box = box
-    this._boxHelper = boxHelper
-  }
-  showBoundingBox(): void {
-    this._box.makeEmpty()
-    this._box.expandByObject(this._object3D)
-    this._boxHelper.visible = true
-  }
+export class ScaleWidgetImp implements ScaleWidget {
+  visible = false
+  position = new Vector3()
 }
