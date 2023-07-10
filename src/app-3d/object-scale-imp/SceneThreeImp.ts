@@ -9,6 +9,7 @@ import {
   Vector3
 } from 'three'
 import type { MousePosition, BoundingBox, Scene, ScaleWidget } from '../ObjectScale'
+import { TransformControls } from 'three/addons/controls/TransformControls.js'
 
 export class SceneThreeImp implements Scene {
   private _scene: SceneThree
@@ -53,6 +54,16 @@ export class BoundingBoxThree implements BoundingBox {
 }
 
 export class ScaleWidgetImp implements ScaleWidget {
-  visible = false
-  position = new Vector3()
+  private _transformControls: TransformControls
+  constructor(transformControls: TransformControls) {
+    this._transformControls = transformControls
+  }
+
+  set visible(val: boolean) {
+    this._transformControls.visible = val
+  }
+
+  set position(val: Vector3) {
+    this._transformControls.position.copy(val)
+  }
 }
