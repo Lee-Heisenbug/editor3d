@@ -5,11 +5,9 @@ import {
   type Scene as SceneThree,
   Object3D,
   Box3Helper,
-  type Event,
-  Vector3
+  type Event
 } from 'three'
-import type { MousePosition, BoundingBox, Scene, ScaleWidget } from '../ObjectScale'
-import { TransformControls } from 'three/addons/controls/TransformControls.js'
+import type { MousePosition, BoundingBox, Scene } from '../ObjectScale'
 
 export class SceneThreeImp implements Scene {
   private _scene: SceneThree
@@ -50,20 +48,5 @@ export class BoundingBoxThree implements BoundingBox {
   update(object: Object3D<Event>): void {
     this._boxHelper.box.makeEmpty()
     this._boxHelper.box.expandByObject(object)
-  }
-}
-
-export class ScaleWidgetImp implements ScaleWidget {
-  private _transformControls: TransformControls
-  constructor(transformControls: TransformControls) {
-    this._transformControls = transformControls
-  }
-
-  set visible(val: boolean) {
-    this._transformControls.visible = val
-  }
-
-  set position(val: Vector3) {
-    this._transformControls.position.copy(val)
   }
 }

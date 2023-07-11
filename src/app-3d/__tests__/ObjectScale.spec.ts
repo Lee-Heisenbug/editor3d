@@ -1,14 +1,7 @@
-import { beforeAll, describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { ObjectScale } from '../ObjectScale'
-import type {
-  MouseEventCallback,
-  Mouse,
-  MousePosition,
-  Scene,
-  ScaleWidget,
-  BoundingBox
-} from '../ObjectScale'
-import { Object3D, Vector3 } from 'three'
+import type { MouseEventCallback, Mouse, MousePosition, Scene, BoundingBox } from '../ObjectScale'
+import { Object3D } from 'three'
 
 class MouseTest implements Mouse {
   callback: MouseEventCallback | null = null
@@ -26,11 +19,6 @@ class SceneTest implements Scene {
   }
 }
 
-class ScaleWidgetTest implements ScaleWidget {
-  visible = false
-  position = new Vector3()
-}
-
 class BoundingBoxTest implements BoundingBox {
   visible = false
   object: Object3D | null = null
@@ -38,13 +26,15 @@ class BoundingBoxTest implements BoundingBox {
     this.object = object
   }
 }
+
 const mouse = new MouseTest()
 const scene = new SceneTest()
-const scaleWidget = new ScaleWidgetTest()
 const boundingBox = new BoundingBoxTest()
-const objectScale = new ObjectScale(mouse, scene, scaleWidget, boundingBox)
+const objectScale = new ObjectScale(mouse, scene, boundingBox)
+const objectSelectCallback = vi.fn()
 
 describe('ObjectScale', () => {
+  objectScale.onObjectSelect(objectSelectCallback)
   objectScale.initiate()
   const pos: MousePosition = [0, 0]
 
@@ -63,12 +53,8 @@ describe('ObjectScale', () => {
       expect(boundingBox.object).toBe(scene.selectedObject)
     })
 
-    it('should show scale widget', () => {
-      expect(scaleWidget.visible).toBe(true)
-    })
-
-    it("should set scale widget' position to object's position", () => {
-      expect(scaleWidget.position).toBe(scene.selectedObject!.position)
+    it('should invoke callback', () => {
+      expect(objectSelectCallback).toHaveBeenCalledWith(scene.selectedObject)
     })
   })
 
@@ -76,7 +62,6 @@ describe('ObjectScale', () => {
     beforeAll(() => {
       scene.selectedObject = null
       boundingBox.visible = true
-      scaleWidget.visible = true
       mouse.callback!(pos)
     })
 
@@ -84,8 +69,8 @@ describe('ObjectScale', () => {
       expect(boundingBox.visible).toBe(false)
     })
 
-    it('should hide scale widget', () => {
-      expect(scaleWidget.visible).toBe(false)
+    it('should invoke callback', () => {
+      expect(objectSelectCallback).toHaveBeenCalledWith(scene.selectedObject)
     })
   })
 })

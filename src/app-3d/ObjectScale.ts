@@ -1,4 +1,4 @@
-import type { Object3D, Vector3 } from 'three'
+import type { Object3D } from 'three'
 
 export interface Mouse {
   onClick(callback: MouseEventCallback): void
@@ -20,20 +20,16 @@ export interface BoundingBox {
   update(object: Object3D): void
 }
 
-export interface ScaleWidget {
-  visible: boolean
-  position: Vector3
-}
+export type ObjectSelectCallback = (selectedObject: Object3D | null) => void
 
 export class ObjectScale {
   private _mouse: Mouse
   private _scene: Scene
-  private _scaleWidget: ScaleWidget
   private _boundingBox: BoundingBox
-  constructor(mouse: Mouse, scene: Scene, scaleWidget: ScaleWidget, boundingBox: BoundingBox) {
+  private _objectSelectedCallback: ObjectSelectCallback = () => {}
+  constructor(mouse: Mouse, scene: Scene, boundingBox: BoundingBox) {
     this._mouse = mouse
     this._scene = scene
-    this._scaleWidget = scaleWidget
     this._boundingBox = boundingBox
   }
 
@@ -43,12 +39,15 @@ export class ObjectScale {
       if (selectedObject) {
         this._boundingBox.visible = true
         this._boundingBox.update(selectedObject)
-        this._scaleWidget.visible = true
-        this._scaleWidget.position = selectedObject.position
       } else {
         this._boundingBox.visible = false
-        this._scaleWidget.visible = false
       }
+
+      this._objectSelectedCallback(selectedObject)
     })
+  }
+
+  onObjectSelect(cb: ObjectSelectCallback) {
+    this._objectSelectedCallback = cb
   }
 }
