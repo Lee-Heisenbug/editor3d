@@ -9,8 +9,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { GridAdder } from './app3d-imp/GridAdder'
 import { InitiatorComposite } from './app3d-imp/InitiatorComposite'
 import { InitFuncInitiator } from './app3d-imp/InitFuncInitiator'
-import { TransformControls } from 'three/addons/controls/TransformControls.js'
 import { ObjectSelectionInitiator } from './app3d-imp/ObjectSelectionInitiator'
+import { Transforming } from './app3d-imp/Transforming'
 
 export function createApp3D(canvas: HTMLCanvasElement) {
   const scene = new Scene()
@@ -23,8 +23,6 @@ export function createApp3D(canvas: HTMLCanvasElement) {
   const modelLoader = new GLTFModelLoader([carModelSrc, garageModelSrc], gltfLoader)
   const resizer = new RendererAndCameraResizer(renderer, camera)
   const cameraControl = new CameraControlImp()
-  const gridAdder = new GridAdder()
-  const transformControl = new TransformControls(camera, canvas)
 
   return new App3D(
     scene,
@@ -34,13 +32,17 @@ export function createApp3D(canvas: HTMLCanvasElement) {
     resizer,
     cameraControl,
     new InitiatorComposite([
-      gridAdder,
+      new GridAdder(),
       new InitFuncInitiator([
         (infra) => {
-          const initiator = new ObjectSelectionInitiator()
-          initiator.initiate(infra)
+          const selection = new ObjectSelectionInitiator()
+          selection.initiate(infra)
+          const transforming = new Transforming()
+          transforming.initiate(infra)
 
-          initiator.objectSelection.onObjectSelect((object) => {
+          const transformControl = transforming.transformControl
+
+          selection.objectSelection.onObjectSelect((object) => {
             if (object) {
               transformControl.visible = true
               transformControl.attach(object)
@@ -48,13 +50,7 @@ export function createApp3D(canvas: HTMLCanvasElement) {
               transformControl.visible = false
             }
           })
-        },
-        () => {
-          transformControl.visible = false
-          transformControl.mode = 'translate'
-          scene.add(transformControl)
-        },
-        () => {
+
           transformControl.addEventListener('mouseDown', () => {
             cameraControl.getControls().enabled = false
           })
