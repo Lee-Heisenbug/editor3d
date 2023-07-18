@@ -34,6 +34,7 @@ export function createApp3D(canvas: HTMLCanvasElement) {
   const resizer = new RendererAndCameraResizer(renderer, camera)
   const cameraControl = new CameraControlImp()
   const gridAdder = new GridAdder()
+  const transformControl = new TransformControls(camera, canvas)
 
   return new App3D(
     scene,
@@ -50,19 +51,6 @@ export function createApp3D(canvas: HTMLCanvasElement) {
           const box = new Box3()
           const boxHelper = new IntersectionIgnoreBox3Helper(box)
           const boundingBox = new BoundingBoxThree(boxHelper)
-
-          const transformControl = new TransformControls(camera, renderer.domElement)
-          transformControl.visible = false
-          transformControl.mode = 'translate'
-          scene.add(transformControl)
-
-          transformControl.addEventListener('mouseDown', () => {
-            cameraControl.getControls().enabled = false
-          })
-
-          transformControl.addEventListener('mouseUp', () => {
-            cameraControl.getControls().enabled = true
-          })
 
           boxHelper.visible = false
           infra.scene.add(boxHelper)
@@ -82,6 +70,19 @@ export function createApp3D(canvas: HTMLCanvasElement) {
             } else {
               transformControl.visible = false
             }
+          })
+        },
+        () => {
+          transformControl.visible = false
+          transformControl.mode = 'translate'
+          scene.add(transformControl)
+
+          transformControl.addEventListener('mouseDown', () => {
+            cameraControl.getControls().enabled = false
+          })
+
+          transformControl.addEventListener('mouseUp', () => {
+            cameraControl.getControls().enabled = true
           })
         }
       ])
