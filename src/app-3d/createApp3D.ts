@@ -56,6 +56,14 @@ export function createApp3D(canvas: HTMLCanvasElement) {
           transformControl.mode = 'translate'
           scene.add(transformControl)
 
+          transformControl.addEventListener('mouseDown', () => {
+            cameraControl.getControls().enabled = false
+          })
+
+          transformControl.addEventListener('mouseUp', () => {
+            cameraControl.getControls().enabled = true
+          })
+
           boxHelper.visible = false
           infra.scene.add(boxHelper)
 
