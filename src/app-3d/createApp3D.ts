@@ -24,6 +24,9 @@ export function createApp3D(canvas: HTMLCanvasElement) {
   const resizer = new RendererAndCameraResizer(renderer, camera)
   const cameraControl = new CameraControlImp()
 
+  const selection = new ObjectSelectionInitiator()
+  const transforming = new Transforming(selection)
+
   return new App3D(
     scene,
     camera,
@@ -33,23 +36,11 @@ export function createApp3D(canvas: HTMLCanvasElement) {
     cameraControl,
     new InitiatorComposite([
       new GridAdder(),
+      selection,
+      transforming,
       new InitFuncInitiator([
-        (infra) => {
-          const selection = new ObjectSelectionInitiator()
-          selection.initiate(infra)
-          const transforming = new Transforming()
-          transforming.initiate(infra)
-
+        () => {
           const transformControl = transforming.transformControl
-
-          selection.objectSelection.onObjectSelect((object) => {
-            if (object) {
-              transformControl.visible = true
-              transformControl.attach(object)
-            } else {
-              transformControl.visible = false
-            }
-          })
 
           transformControl.addEventListener('mouseDown', () => {
             cameraControl.getControls().enabled = false
