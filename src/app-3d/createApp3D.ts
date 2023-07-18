@@ -8,9 +8,9 @@ import garageModelSrc from './garage.glb'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { GridAdder } from './app3d-imp/GridAdder'
 import { InitiatorComposite } from './app3d-imp/InitiatorComposite'
-import { InitFuncInitiator } from './app3d-imp/InitFuncInitiator'
 import { ObjectSelectionInitiator } from './app3d-imp/ObjectSelectionInitiator'
 import { Transforming } from './app3d-imp/Transforming'
+import { MouseConflictResolving } from './app3d-imp/MouseConflictResolving'
 
 export function createApp3D(canvas: HTMLCanvasElement) {
   const scene = new Scene()
@@ -38,19 +38,7 @@ export function createApp3D(canvas: HTMLCanvasElement) {
       new GridAdder(),
       selection,
       transforming,
-      new InitFuncInitiator([
-        () => {
-          const transformControl = transforming.transformControl
-
-          transformControl.addEventListener('mouseDown', () => {
-            cameraControl.getControls().enabled = false
-          })
-
-          transformControl.addEventListener('mouseUp', () => {
-            cameraControl.getControls().enabled = true
-          })
-        }
-      ])
+      new MouseConflictResolving(transforming, cameraControl)
     ])
   )
 }
