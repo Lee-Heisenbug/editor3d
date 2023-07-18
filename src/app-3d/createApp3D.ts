@@ -9,18 +9,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { GridAdder } from './app3d-imp/GridAdder'
 import { InitiatorComposite } from './app3d-imp/InitiatorComposite'
 import { InitFuncInitiator } from './app3d-imp/InitFuncInitiator'
-import { Box3, Box3Helper, Raycaster } from 'three'
-import { ObjectSelection } from './ObjectSelection'
-import { MouseDOMImp } from './object-scale-imp/MouseDOMImp'
-import { BoundingBoxThree, SceneThreeImp } from './object-scale-imp/SceneThreeImp'
 import { TransformControls } from 'three/addons/controls/TransformControls.js'
-
-class IntersectionIgnoreBox3Helper extends Box3Helper {
-  raycast(): void {
-    this._doNothingToIgnoreIntersection()
-  }
-  _doNothingToIgnoreIntersection() {}
-}
+import { ObjectSelectionInitiator } from './app3d-imp/ObjectSelectionInitiator'
 
 export function createApp3D(canvas: HTMLCanvasElement) {
   const scene = new Scene()
@@ -47,23 +37,10 @@ export function createApp3D(canvas: HTMLCanvasElement) {
       gridAdder,
       new InitFuncInitiator([
         (infra) => {
-          const raycaster = new Raycaster()
-          const box = new Box3()
-          const boxHelper = new IntersectionIgnoreBox3Helper(box)
-          const boundingBox = new BoundingBoxThree(boxHelper)
+          const initiator = new ObjectSelectionInitiator()
+          initiator.initiate(infra)
 
-          boxHelper.visible = false
-          infra.scene.add(boxHelper)
-
-          const objectScale = new ObjectSelection(
-            new MouseDOMImp(infra.renderer.domElement),
-            new SceneThreeImp(infra.scene, infra.camera, infra.renderer.domElement, raycaster),
-            boundingBox
-          )
-
-          objectScale.initiate()
-
-          objectScale.onObjectSelect((object) => {
+          initiator.objectSelection.onObjectSelect((object) => {
             if (object) {
               transformControl.visible = true
               transformControl.attach(object)
@@ -76,7 +53,8 @@ export function createApp3D(canvas: HTMLCanvasElement) {
           transformControl.visible = false
           transformControl.mode = 'translate'
           scene.add(transformControl)
-
+        },
+        () => {
           transformControl.addEventListener('mouseDown', () => {
             cameraControl.getControls().enabled = false
           })

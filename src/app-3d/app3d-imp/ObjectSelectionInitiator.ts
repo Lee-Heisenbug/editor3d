@@ -11,7 +11,8 @@ class IntersectionIgnoreBox3Helper extends Box3Helper {
   _doNothingToIgnoreIntersection() {}
 }
 
-export class ObjectScaleInitiator implements Initiator {
+export class ObjectSelectionInitiator implements Initiator {
+  objectSelection!: ObjectSelection
   initiate(infra: Infra): void {
     const raycaster = new Raycaster()
     const box = new Box3()
@@ -21,12 +22,12 @@ export class ObjectScaleInitiator implements Initiator {
     boxHelper.visible = false
     infra.scene.add(boxHelper)
 
-    const objectScale = new ObjectSelection(
+    this.objectSelection = new ObjectSelection(
       new MouseDOMImp(infra.renderer.domElement),
       new SceneThreeImp(infra.scene, infra.camera, infra.renderer.domElement, raycaster),
       boundingBox
     )
 
-    objectScale.initiate()
+    this.objectSelection.initiate()
   }
 }
