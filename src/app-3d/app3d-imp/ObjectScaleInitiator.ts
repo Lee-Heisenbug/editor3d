@@ -1,6 +1,6 @@
 import { Box3, Box3Helper, Raycaster } from 'three'
 import type { Infra, Initiator } from '../App3D'
-import { ObjectScale } from '../ObjectScale'
+import { ObjectSelection } from '../ObjectSelection'
 import { MouseDOMImp } from '../object-scale-imp/MouseDOMImp'
 import { BoundingBoxThree, SceneThreeImp } from '../object-scale-imp/SceneThreeImp'
 
@@ -21,7 +21,7 @@ export class ObjectScaleInitiator implements Initiator {
     boxHelper.visible = false
     infra.scene.add(boxHelper)
 
-    const objectScale = new ObjectScale(
+    const objectScale = new ObjectSelection(
       new MouseDOMImp(infra.renderer.domElement),
       new SceneThreeImp(infra.scene, infra.camera, infra.renderer.domElement, raycaster),
       boundingBox

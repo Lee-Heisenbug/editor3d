@@ -1,4 +1,4 @@
-import type { Mouse, MouseEventCallback, MousePosition } from '../ObjectScale'
+import type { Mouse, MouseEventCallback, MousePosition } from '../ObjectSelection'
 
 export class MouseDOMImp implements Mouse {
   private _dom: HTMLElement

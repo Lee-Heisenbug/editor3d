@@ -1,6 +1,12 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest'
-import { ObjectScale } from '../ObjectScale'
-import type { MouseEventCallback, Mouse, MousePosition, Scene, BoundingBox } from '../ObjectScale'
+import { ObjectSelection } from '../ObjectSelection'
+import type {
+  MouseEventCallback,
+  Mouse,
+  MousePosition,
+  Scene,
+  BoundingBox
+} from '../ObjectSelection'
 import { Object3D } from 'three'
 
 class MouseTest implements Mouse {
@@ -30,12 +36,12 @@ class BoundingBoxTest implements BoundingBox {
 const mouse = new MouseTest()
 const scene = new SceneTest()
 const boundingBox = new BoundingBoxTest()
-const objectScale = new ObjectScale(mouse, scene, boundingBox)
+const objectSelection = new ObjectSelection(mouse, scene, boundingBox)
 const objectSelectCallback = vi.fn()
 
-describe('ObjectScale', () => {
-  objectScale.onObjectSelect(objectSelectCallback)
-  objectScale.initiate()
+describe('ObjectSelection', () => {
+  objectSelection.onObjectSelect(objectSelectCallback)
+  objectSelection.initiate()
   const pos: MousePosition = [0, 0]
 
   describe('when a object is selected', () => {

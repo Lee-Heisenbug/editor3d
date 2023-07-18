@@ -22,7 +22,7 @@ export interface BoundingBox {
 
 export type ObjectSelectCallback = (selectedObject: Object3D | null) => void
 
-export class ObjectScale {
+export class ObjectSelection {
   private _mouse: Mouse
   private _scene: Scene
   private _boundingBox: BoundingBox

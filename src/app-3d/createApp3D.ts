@@ -10,7 +10,7 @@ import { GridAdder } from './app3d-imp/GridAdder'
 import { InitiatorComposite } from './app3d-imp/InitiatorComposite'
 import { InitFuncInitiator } from './app3d-imp/InitFuncInitiator'
 import { Box3, Box3Helper, Raycaster } from 'three'
-import { ObjectScale } from './ObjectScale'
+import { ObjectSelection } from './ObjectSelection'
 import { MouseDOMImp } from './object-scale-imp/MouseDOMImp'
 import { BoundingBoxThree, SceneThreeImp } from './object-scale-imp/SceneThreeImp'
 import { TransformControls } from 'three/addons/controls/TransformControls.js'
@@ -59,7 +59,7 @@ export function createApp3D(canvas: HTMLCanvasElement) {
           boxHelper.visible = false
           infra.scene.add(boxHelper)
 
-          const objectScale = new ObjectScale(
+          const objectScale = new ObjectSelection(
             new MouseDOMImp(infra.renderer.domElement),
             new SceneThreeImp(infra.scene, infra.camera, infra.renderer.domElement, raycaster),
             boundingBox

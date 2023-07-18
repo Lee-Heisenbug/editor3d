@@ -7,7 +7,7 @@ import {
   Box3Helper,
   type Event
 } from 'three'
-import type { MousePosition, BoundingBox, Scene } from '../ObjectScale'
+import type { MousePosition, BoundingBox, Scene } from '../ObjectSelection'
 
 export class SceneThreeImp implements Scene {
   private _scene: SceneThree
