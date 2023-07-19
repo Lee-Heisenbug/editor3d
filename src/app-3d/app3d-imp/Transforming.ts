@@ -25,5 +25,7 @@ export class Transforming implements Initiator {
         this.transformControl.visible = false
       }
     })
+
+    this._objectSelectionInitiator.addIgnoreSelectionObject(this.transformControl)
   }
 }

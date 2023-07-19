@@ -14,11 +14,13 @@ export class SceneThreeImp implements Scene {
   private _camera: Camera
   private _dom: HTMLCanvasElement
   private _raycaster: Raycaster
+  ignoreObjects: Object3D[]
   constructor(scene: SceneThree, camera: Camera, dom: HTMLCanvasElement, raycaster: Raycaster) {
     this._scene = scene
     this._camera = camera
     this._dom = dom
     this._raycaster = raycaster
+    this.ignoreObjects = []
   }
   selectObject(mousePosition: MousePosition) {
     const clipPos = new Vector2(
@@ -27,7 +29,16 @@ export class SceneThreeImp implements Scene {
     )
 
     this._raycaster.setFromCamera(clipPos, this._camera)
-    const intersection = this._raycaster.intersectObject(this._scene)
+    let intersection = this._raycaster.intersectObject(this._scene)
+    intersection = intersection.filter((intersection) => {
+      let root = intersection.object
+
+      while (root.parent && root.parent !== this._scene) {
+        root = root.parent
+      }
+
+      return this.ignoreObjects.indexOf(root) === -1
+    })
 
     if (intersection[0]) {
       return intersection[0].object
