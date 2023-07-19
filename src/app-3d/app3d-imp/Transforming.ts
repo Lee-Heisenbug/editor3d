@@ -17,6 +17,12 @@ export class Transforming implements Initiator {
     this.transformControl.mode = 'translate'
     scene.add(this.transformControl)
 
+    this._attachedToObjectOnObjectSelected()
+
+    this._ignoreTransformGizmoSelection()
+  }
+
+  private _attachedToObjectOnObjectSelected() {
     this._objectSelectionInitiator.objectSelection.onObjectSelect((object) => {
       if (object) {
         this.transformControl.visible = true
@@ -25,7 +31,9 @@ export class Transforming implements Initiator {
         this.transformControl.visible = false
       }
     })
+  }
 
+  private _ignoreTransformGizmoSelection() {
     this._objectSelectionInitiator.addIgnoreSelectionObject(this.transformControl)
   }
 }
