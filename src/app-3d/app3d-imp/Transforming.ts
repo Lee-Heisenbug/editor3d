@@ -20,6 +20,8 @@ export class Transforming implements Initiator {
     this._attachedToObjectOnObjectSelected()
 
     this._ignoreTransformGizmoSelection()
+
+    this._updateSelectionBoundingBoxOnChanged()
   }
 
   private _attachedToObjectOnObjectSelected() {
@@ -35,5 +37,16 @@ export class Transforming implements Initiator {
 
   private _ignoreTransformGizmoSelection() {
     this._objectSelectionInitiator.addIgnoreSelectionObject(this.transformControl)
+  }
+
+  private _updateSelectionBoundingBoxOnChanged() {
+    const selectionBox = this._objectSelectionInitiator.selectionBox.box
+    this.transformControl.addEventListener('change', () => {
+      const object = this.transformControl.object
+
+      if (object !== undefined) {
+        selectionBox.setFromObject(object)
+      }
+    })
   }
 }
