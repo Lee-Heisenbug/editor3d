@@ -21,7 +21,9 @@ export class Transforming implements Initiator {
 
     this._ignoreTransformGizmoSelection()
 
-    this._updateSelectionBoundingBoxOnChanged()
+    this._updateSelectionBoxOnObjectTransformed()
+
+    this._changeTransformModeWhenPressKey()
   }
 
   private _attachedToObjectOnObjectSelected() {
@@ -39,13 +41,34 @@ export class Transforming implements Initiator {
     this._objectSelectionInitiator.addIgnoreSelectionObject(this.transformControl)
   }
 
-  private _updateSelectionBoundingBoxOnChanged() {
+  private _updateSelectionBoxOnObjectTransformed() {
     const selectionBox = this._objectSelectionInitiator.selectionBox.box
     this.transformControl.addEventListener('change', () => {
       const object = this.transformControl.object
 
       if (object !== undefined) {
         selectionBox.setFromObject(object)
+      }
+    })
+  }
+
+  private _changeTransformModeWhenPressKey() {
+    window.addEventListener('keydown', (e) => {
+      switch (e.code) {
+        case 'KeyT': {
+          this.transformControl.mode = 'translate'
+          break
+        }
+
+        case 'KeyR': {
+          this.transformControl.mode = 'rotate'
+          break
+        }
+
+        case 'KeyS': {
+          this.transformControl.mode = 'scale'
+          break
+        }
       }
     })
   }
