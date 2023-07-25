@@ -10,18 +10,24 @@ onMounted(() => {
   }
 })
 
-let text = ref(`Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, ratione debitis quis est labore voluptatibus! Eaque cupiditate minima, at placeat totam, magni doloremque veniam neque porro libero rerum unde voluptatem!`)
+let text = ref(`3d编辑器项目`)
 </script>
 
 <template>
   <div class="editor3d">
     <canvas ref="app3dCanvas" class="app-3d"></canvas>
-    <v-card title="Card title" :text="text"></v-card>
+    <v-card class="editor3d-card" title="项目说明" :text="text"></v-card>
   </div>
 </template>
 
-<style scoped>
+<style scoped type="scss">
 .editor3d {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.editor3d .editor3d-card {
   position: fixed;
   top: 0;
   left: 0;
