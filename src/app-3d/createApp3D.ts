@@ -1,5 +1,5 @@
 import { PerspectiveCamera, Scene, WebGLRenderer } from 'three'
-import { App3D } from './App3D'
+import { App3D as AppThree } from './App3D'
 import { GLTFModelLoader } from './app3d-imp/GLTFModelLoader'
 import { RendererAndCameraResizer } from './app3d-imp/RendererAndCameraResizer'
 import { CameraControlImp } from './app3d-imp/CameraControlImp'
@@ -12,7 +12,7 @@ import { ObjectSelectionInitiator } from './app3d-imp/ObjectSelectionInitiator'
 import { Transforming } from './app3d-imp/Transforming'
 import { MouseConflictResolving } from './app3d-imp/MouseConflictResolving'
 
-export function createApp3D(canvas: HTMLCanvasElement) {
+export function createApp3D(canvas: HTMLCanvasElement): App3D {
   const scene = new Scene()
   const renderer = new WebGLRenderer({
     canvas
@@ -27,7 +27,7 @@ export function createApp3D(canvas: HTMLCanvasElement) {
   const selection = new ObjectSelectionInitiator()
   const transforming = new Transforming(selection)
 
-  return new App3D(
+  const appThree = new AppThree(
     scene,
     camera,
     renderer,
@@ -41,4 +41,24 @@ export function createApp3D(canvas: HTMLCanvasElement) {
       new MouseConflictResolving(transforming, cameraControl)
     ])
   )
+
+  return {
+    initiate() {
+      appThree.initiate()
+    },
+    onHierachyChanged() {}
+  }
+}
+
+type Node = {
+  id: string
+  name: string
+  children: Node[]
+}
+
+type HierarchyChangedCallback = Node[]
+
+interface App3D {
+  initiate(): void
+  onHierachyChanged(cb: HierarchyChangedCallback): void
 }
