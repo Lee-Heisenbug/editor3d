@@ -7,6 +7,9 @@ onMounted(() => {
   if (app3dCanvas.value) {
     let app3d = createApp3D(app3dCanvas.value)
     app3d.initiate()
+    app3d.onHierachyChanged((h) => {
+      console.log(h)
+    })
   }
 })
 
