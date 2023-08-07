@@ -26,10 +26,10 @@ let text = ref(`3d编辑器项目`)
         {
           id: '1',
           name: 'name1',
-          children: [{ id: '1-1', name: 'name2', children: [] }]
+          children: [{ id: '1-1', name: 'name1-2', children: [] }]
         },
-        { id: '2', name: 'name1', children: [] },
-        { id: '3', name: 'name1', children: [] }
+        { id: '2', name: 'name2', children: [] },
+        { id: '3', name: 'name3', children: [] }
       ]"
     ></SceneHierarchy>
   </div>

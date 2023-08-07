@@ -1,5 +1,5 @@
 <template>
-  <v-list class="hierarchy">
+  <v-list class="hierarchy" :opened="[]">
     <HierarchyNode :key="nodeData.id" v-for="nodeData in data" :data="nodeData"></HierarchyNode>
   </v-list>
 </template>

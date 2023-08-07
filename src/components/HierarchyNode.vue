@@ -1,5 +1,5 @@
 <template>
-  <v-list-group class="hierarchy-node" :value="data.name">
+  <v-list-group class="hierarchy-node" :value="data.id">
     <template v-slot:activator="{ props }">
       <v-list-item v-bind="props" :title="data.name"></v-list-item>
     </template>
