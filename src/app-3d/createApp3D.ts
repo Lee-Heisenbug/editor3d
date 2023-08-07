@@ -1,5 +1,5 @@
 import { Object3D, PerspectiveCamera, Scene as SceneThree, WebGLRenderer } from 'three'
-import { App3D as AppThree, type ModelLoader } from './App3D'
+import { App3D, type ModelLoader } from './App3D'
 import { GLTFModelLoader } from './app3d-imp/GLTFModelLoader'
 import { RendererAndCameraResizer } from './app3d-imp/RendererAndCameraResizer'
 import { CameraControlImp } from './app3d-imp/CameraControlImp'
@@ -33,7 +33,7 @@ export function createApp3D(canvas: HTMLCanvasElement): UI {
 
   const ui = new UIComposite()
 
-  const appThree = new AppThree(
+  const appThree = new App3D(
     scene,
     camera,
     renderer,
@@ -98,8 +98,8 @@ class UIComposite implements UI {
 }
 
 class UIImp implements UI {
-  private _appThree: AppThree
-  constructor(appThree: AppThree) {
+  private _appThree: App3D
+  constructor(appThree: App3D) {
     this._appThree = appThree
   }
   initiate() {

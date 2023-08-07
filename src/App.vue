@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { createApp3D } from './app-3d/createApp3D'
+import SceneHierarchy from './components/SceneHierarchy.vue'
 let app3dCanvas = ref<HTMLCanvasElement | null>(null)
 
 onMounted(() => {
@@ -20,6 +21,17 @@ let text = ref(`3d编辑器项目`)
   <div class="editor3d">
     <canvas ref="app3dCanvas" class="app-3d"></canvas>
     <v-card class="editor3d-card" title="项目说明" :text="text"></v-card>
+    <SceneHierarchy
+      :data="[
+        {
+          id: '1',
+          name: 'name1',
+          children: [{ id: '1-1', name: 'name2', children: [] }]
+        },
+        { id: '2', name: 'name1', children: [] },
+        { id: '3', name: 'name1', children: [] }
+      ]"
+    ></SceneHierarchy>
   </div>
 </template>
 
