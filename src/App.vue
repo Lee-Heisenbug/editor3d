@@ -2,36 +2,27 @@
 import { ref, onMounted } from 'vue'
 import { createApp3D } from './app-3d/createApp3D'
 import SceneHierarchy from './components/SceneHierarchy.vue'
+import type { Node } from './components/HierarchyNode.vue'
 let app3dCanvas = ref<HTMLCanvasElement | null>(null)
+
+let hierarchy = ref<Node[]>([])
 
 onMounted(() => {
   if (app3dCanvas.value) {
     let app3d = createApp3D(app3dCanvas.value)
     app3d.initiate()
     app3d.onHierachyChanged((h) => {
-      console.log(h)
+      console.log(hierarchy.value)
+      hierarchy.value = h
     })
   }
 })
-
-let text = ref(`3d编辑器项目`)
 </script>
 
 <template>
   <div class="editor3d">
     <canvas ref="app3dCanvas" class="app-3d"></canvas>
-    <v-card class="editor3d-card" title="项目说明" :text="text"></v-card>
-    <SceneHierarchy
-      :data="[
-        {
-          id: '1',
-          name: 'name1',
-          children: [{ id: '1-1', name: 'name1-2', children: [] }]
-        },
-        { id: '2', name: 'name2', children: [] },
-        { id: '3', name: 'name3', children: [] }
-      ]"
-    ></SceneHierarchy>
+    <SceneHierarchy :data="hierarchy"></SceneHierarchy>
   </div>
 </template>
 
