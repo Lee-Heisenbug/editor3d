@@ -1,5 +1,10 @@
 <template>
-  <v-list-group class="hierarchy-node" :value="data.id">
+  <v-list-group
+    class="hierarchy-node"
+    :value="data.id"
+    :collapse-icon="collapseIcon"
+    :expand-icon="expandIcon"
+  >
     <template v-slot:activator="{ props }">
       <v-list-item v-bind="props" :title="data.name"></v-list-item>
     </template>
@@ -12,15 +17,25 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 export interface Node {
   id: string
   name: string
   children: Node[]
 }
 
-defineProps<{
+let props = defineProps<{
   data: Node
 }>()
+
+let collapseIcon = computed(() => {
+  return props.data.children.length > 0 ? '$collapse' : ''
+})
+
+let expandIcon = computed(() => {
+  return props.data.children.length > 0 ? '$expand' : ''
+})
 </script>
 
 <style scoped>
