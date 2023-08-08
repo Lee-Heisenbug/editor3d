@@ -1,17 +1,11 @@
 <template>
-  <div class="scene-hierarchy overflow-auto bg-white">
-    <v-card title="场景" height="100%" class="overflow-auto">
-      <v-card-text>
-        <v-list class="hierarchy" density="compact">
-          <HierarchyNode
-            :key="nodeData.id"
-            v-for="nodeData in data"
-            :data="nodeData"
-          ></HierarchyNode>
-        </v-list>
-      </v-card-text>
-    </v-card>
-  </div>
+  <v-card title="场景" height="100%" class="scene-hierarchy overflow-auto bg-white">
+    <v-card-text>
+      <v-list class="hierarchy" density="compact">
+        <HierarchyNode :key="nodeData.id" v-for="nodeData in data" :data="nodeData"></HierarchyNode>
+      </v-list>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script setup lang="ts">
