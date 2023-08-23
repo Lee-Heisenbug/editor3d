@@ -4,13 +4,13 @@
     <a-divider />
     <div class="container">
       <a-tree
+        v-if="data.length"
         :fieldNames="{
           title: 'name',
           key: 'id',
           children: 'children'
         }"
         :tree-data="data"
-        :autoExpandParent="true"
         default-expand-all
       />
     </div>
