@@ -1,15 +1,36 @@
 <template>
-  <v-card title="场景" height="100%" class="scene-hierarchy overflow-auto bg-white">
-    <v-card-text>
-      <v-list class="hierarchy" density="compact">
-        <HierarchyNode :key="nodeData.id" v-for="nodeData in data" :data="nodeData"></HierarchyNode>
-      </v-list>
-    </v-card-text>
-  </v-card>
+  <div class="scene-hierarchy">
+    <a-tree
+      :fieldNames="{
+        title: 'name',
+        key: 'id',
+        children: 'children'
+      }"
+      :tree-data="data"
+    ></a-tree>
+  </div>
 </template>
 
 <script setup lang="ts">
-import HierarchyNode, { type Node } from './HierarchyNode.vue'
+import { watch } from 'vue'
+import { ref } from 'vue'
+
+interface Node {
+  id: string
+  name: string
+  children: Node[]
+}
+
+let selected = ref([])
+let opened = ref([])
+
+watch(selected, (v) => {
+  console.log('selected: ', v)
+})
+
+watch(opened, (v) => {
+  console.log('opened: ', v)
+})
 
 defineProps<{
   data: Node[]
@@ -24,5 +45,8 @@ defineProps<{
 
   width: 300px;
   height: 100%;
+
+  background: white;
+  overflow: auto;
 }
 </style>
