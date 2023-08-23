@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { createApp3D } from './app-3d/createApp3D'
 import SceneHierarchy from './components/SceneHierarchy.vue'
-import type { Node } from './components/HierarchyNode.vue'
+import type { Node } from './components/SceneHierarchy.vue'
 let app3dCanvas = ref<HTMLCanvasElement | null>(null)
 
 let hierarchy = ref<Node[]>([])

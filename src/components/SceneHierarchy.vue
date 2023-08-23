@@ -1,36 +1,28 @@
 <template>
   <div class="scene-hierarchy">
-    <a-tree
-      :fieldNames="{
-        title: 'name',
-        key: 'id',
-        children: 'children'
-      }"
-      :tree-data="data"
-    ></a-tree>
+    <a-typography-title :level="5">场景</a-typography-title>
+    <a-divider />
+    <div class="container">
+      <a-tree
+        :fieldNames="{
+          title: 'name',
+          key: 'id',
+          children: 'children'
+        }"
+        :tree-data="data"
+        :autoExpandParent="true"
+        default-expand-all
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue'
-import { ref } from 'vue'
-
-interface Node {
+export interface Node {
   id: string
   name: string
   children: Node[]
 }
-
-let selected = ref([])
-let opened = ref([])
-
-watch(selected, (v) => {
-  console.log('selected: ', v)
-})
-
-watch(opened, (v) => {
-  console.log('opened: ', v)
-})
 
 defineProps<{
   data: Node[]
@@ -39,14 +31,26 @@ defineProps<{
 
 <style scoped>
 .scene-hierarchy {
+  display: flex;
+  flex-direction: column;
+
   position: fixed;
   top: 0;
   left: 0;
 
   width: 300px;
   height: 100%;
+  padding: 0.5em;
 
   background: white;
+}
+
+.ant-divider {
+  margin: 0 0 0.5em 0;
+}
+
+.scene-hierarchy .container {
+  flex-grow: 1;
   overflow: auto;
 }
 </style>
