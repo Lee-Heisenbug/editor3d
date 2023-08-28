@@ -15,34 +15,20 @@ export interface Scene {
   selectObject(mousePosition: MousePosition): Object3D | null
 }
 
-export interface BoundingBox {
-  visible: boolean
-  update(object: Object3D): void
-}
-
 export type ObjectSelectCallback = (selectedObject: Object3D | null) => void
 
 export class ObjectSelection {
   private _mouse: Mouse
   private _scene: Scene
-  private _boundingBox: BoundingBox
   private _objectSelectedCallback: ObjectSelectCallback = () => {}
-  constructor(mouse: Mouse, scene: Scene, boundingBox: BoundingBox) {
+  constructor(mouse: Mouse, scene: Scene) {
     this._mouse = mouse
     this._scene = scene
-    this._boundingBox = boundingBox
   }
 
   initiate() {
     this._mouse.onClick((mousePos) => {
       const selectedObject = this._scene.selectObject(mousePos)
-      if (selectedObject) {
-        this._boundingBox.visible = true
-        this._boundingBox.update(selectedObject)
-      } else {
-        this._boundingBox.visible = false
-      }
-
       this._objectSelectedCallback(selectedObject)
     })
   }

@@ -9,7 +9,7 @@ export class MouseDOMImp implements Mouse {
     this._initiate()
   }
 
-  _initiate() {
+  private _initiate() {
     this._dom.addEventListener('mousedown', (e) => {
       this._screenPosOnMouseDown = [e.offsetX, e.offsetY]
     })

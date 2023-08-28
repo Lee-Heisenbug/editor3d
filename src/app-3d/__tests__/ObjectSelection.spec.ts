@@ -1,12 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { ObjectSelection } from '../ObjectSelection'
-import type {
-  MouseEventCallback,
-  Mouse,
-  MousePosition,
-  Scene,
-  BoundingBox
-} from '../ObjectSelection'
+import type { MouseEventCallback, Mouse, MousePosition, Scene } from '../ObjectSelection'
 import { Object3D } from 'three'
 
 class MouseTest implements Mouse {
@@ -25,18 +19,9 @@ class SceneTest implements Scene {
   }
 }
 
-class BoundingBoxTest implements BoundingBox {
-  visible = false
-  object: Object3D | null = null
-  update(object: Object3D) {
-    this.object = object
-  }
-}
-
 const mouse = new MouseTest()
 const scene = new SceneTest()
-const boundingBox = new BoundingBoxTest()
-const objectSelection = new ObjectSelection(mouse, scene, boundingBox)
+const objectSelection = new ObjectSelection(mouse, scene)
 const objectSelectCallback = vi.fn()
 
 describe('ObjectSelection', () => {
@@ -54,11 +39,6 @@ describe('ObjectSelection', () => {
       expect(scene.mousePos).toBe(pos)
     })
 
-    it('should show bounding box', () => {
-      expect(boundingBox.visible).toBe(true)
-      expect(boundingBox.object).toBe(scene.selectedObject)
-    })
-
     it('should invoke callback', () => {
       expect(objectSelectCallback).toHaveBeenCalledWith(scene.selectedObject)
     })
@@ -67,12 +47,7 @@ describe('ObjectSelection', () => {
   describe('when no object is selected', () => {
     beforeAll(() => {
       scene.selectedObject = null
-      boundingBox.visible = true
       mouse.callback!(pos)
-    })
-
-    it('should hide bounding box', () => {
-      expect(boundingBox.visible).toBe(false)
     })
 
     it('should invoke callback', () => {

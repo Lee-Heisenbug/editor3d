@@ -1,13 +1,23 @@
 import type { Infra, Initiator } from '../App3D'
 import { TransformControls } from 'three/addons/controls/TransformControls.js'
+import type { ObjectSelector } from '../ObjectHighlighting'
 import type { ObjectSelectionInitiator } from './ObjectSelectionInitiator'
+import type { Box3 } from 'three'
 
 export class Transforming implements Initiator {
+  private _objectSelector: ObjectSelector
   private _objectSelectionInitiator: ObjectSelectionInitiator
+  private _objectBox: Box3
   transformControl!: TransformControls
 
-  constructor(objectSelection: ObjectSelectionInitiator) {
-    this._objectSelectionInitiator = objectSelection
+  constructor(
+    objectSelector: ObjectSelector,
+    objectSelectionInitiator: ObjectSelectionInitiator,
+    objectBox: Box3
+  ) {
+    this._objectSelector = objectSelector
+    this._objectSelectionInitiator = objectSelectionInitiator
+    this._objectBox = objectBox
   }
 
   initiate({ camera, renderer, scene }: Infra): void {
@@ -27,7 +37,7 @@ export class Transforming implements Initiator {
   }
 
   private _attachedToObjectOnObjectSelected() {
-    this._objectSelectionInitiator.objectSelection.onObjectSelect((object) => {
+    this._objectSelector.onObjectSelect((object) => {
       if (object) {
         this.transformControl.visible = true
         this.transformControl.attach(object)
@@ -42,7 +52,7 @@ export class Transforming implements Initiator {
   }
 
   private _updateSelectionBoxOnObjectTransformed() {
-    const selectionBox = this._objectSelectionInitiator.selectionBox.box
+    const selectionBox = this._objectBox
     this.transformControl.addEventListener('change', () => {
       const object = this.transformControl.object
 

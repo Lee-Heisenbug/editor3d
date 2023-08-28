@@ -1,4 +1,11 @@
-import { Object3D, PerspectiveCamera, Scene as SceneThree, WebGLRenderer } from 'three'
+import {
+  Box3,
+  Box3Helper,
+  Object3D,
+  PerspectiveCamera,
+  Scene as SceneThree,
+  WebGLRenderer
+} from 'three'
 import { App3D, type ModelLoader } from './App3D'
 import { GLTFModelLoader } from './app3d-imp/GLTFModelLoader'
 import { RendererAndCameraResizer } from './app3d-imp/RendererAndCameraResizer'
@@ -12,6 +19,8 @@ import { ObjectSelectionInitiator } from './app3d-imp/ObjectSelectionInitiator'
 import { Transforming } from './app3d-imp/Transforming'
 import { MouseConflictResolving } from './app3d-imp/MouseConflictResolving'
 import { InitFuncInitiator } from './app3d-imp/InitFuncInitiator'
+import { ObjectHighlighting } from './ObjectHighlighting'
+import { BoundingBoxThree, ObjectSelectorImp } from './app3d-imp/object-highlighting-imp'
 
 export function createApp3D(canvas: HTMLCanvasElement): UI {
   const scene = new SceneThree()
@@ -27,7 +36,9 @@ export function createApp3D(canvas: HTMLCanvasElement): UI {
   const cameraControl = new CameraControlImp()
 
   const selection = new ObjectSelectionInitiator()
-  const transforming = new Transforming(selection)
+  const selector = new ObjectSelectorImp()
+  const objectBox = new Box3()
+  const transforming = new Transforming(selector, selection, objectBox)
 
   let modelScene: ModelScene
 
@@ -42,7 +53,11 @@ export function createApp3D(canvas: HTMLCanvasElement): UI {
     cameraControl,
     new InitiatorComposite([
       new GridAdder(),
+      selection,
       new InitFuncInitiator([
+        () => {
+          selector.setObjectSelection(selection.objectSelection)
+        },
         (infra) => {
           const gltfLoader = new GLTFLoader()
           const modelLoader = new GLTFModelLoader([carModelSrc, garageModelSrc], gltfLoader)
@@ -54,9 +69,31 @@ export function createApp3D(canvas: HTMLCanvasElement): UI {
           modelLoader.load((model) => {
             modelScene.add(model)
           })
+        },
+        (infra) => {
+          class IntersectionIgnoreWrapper extends Object3D {
+            constructor(object: Object3D) {
+              super()
+              this.add(object)
+            }
+            add(...object: Object3D[]): this {
+              super.add(...object)
+              object.forEach((obj) => {
+                obj.raycast = () => {}
+              })
+
+              return this
+            }
+          }
+
+          const boxHelper = new Box3Helper(objectBox)
+          boxHelper.visible = false
+
+          infra.scene.add(new IntersectionIgnoreWrapper(boxHelper))
+
+          new ObjectHighlighting(selector, new BoundingBoxThree(boxHelper)).initiate()
         }
       ]),
-      selection,
       transforming,
       new MouseConflictResolving(transforming, cameraControl)
     ])
@@ -78,9 +115,13 @@ type HierarchyChangedCallback = (hierarchy: Node[]) => void
 interface UI {
   initiate(): void
   onHierachyChanged(cb: HierarchyChangedCallback): void
+  onObjectSelect(cb: (id: string) => void): void
 }
 
 class UIComposite implements UI {
+  onObjectSelect(cb: (id: string) => void): void {
+    cb('')
+  }
   private _uis: UI[] = []
   add(ui: UI) {
     this._uis.push(ui)
@@ -102,6 +143,9 @@ class UIImp implements UI {
   constructor(appThree: App3D) {
     this._appThree = appThree
   }
+  onObjectSelect(cb: (id: string) => void): void {
+    cb('')
+  }
   initiate() {
     this._appThree.initiate()
   }
@@ -112,6 +156,9 @@ class ModelSceneUI implements UI {
   private _modelScene: ModelScene
   constructor(modelScene: ModelScene) {
     this._modelScene = modelScene
+  }
+  onObjectSelect(cb: (id: string) => void): void {
+    cb('')
   }
   initiate() {}
   onHierachyChanged(cb: HierarchyChangedCallback) {
