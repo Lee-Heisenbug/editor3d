@@ -57,6 +57,19 @@ export function createApp3D(canvas: HTMLCanvasElement): UI {
       new InitFuncInitiator([
         () => {
           selector.setObjectSelection(selection.objectSelection)
+          ui.add({
+            onObjectSelect(cb) {
+              selector.onObjectSelect((object) => {
+                if (object) {
+                  cb(object.uuid)
+                } else {
+                  cb(null)
+                }
+              })
+            },
+            initiate: () => {},
+            onHierachyChanged: () => {}
+          })
         },
         (infra) => {
           const gltfLoader = new GLTFLoader()
@@ -115,13 +128,10 @@ type HierarchyChangedCallback = (hierarchy: Node[]) => void
 interface UI {
   initiate(): void
   onHierachyChanged(cb: HierarchyChangedCallback): void
-  onObjectSelect(cb: (id: string) => void): void
+  onObjectSelect(cb: (id: string | null) => void): void
 }
 
 class UIComposite implements UI {
-  onObjectSelect(cb: (id: string) => void): void {
-    cb('')
-  }
   private _uis: UI[] = []
   add(ui: UI) {
     this._uis.push(ui)
@@ -136,6 +146,11 @@ class UIComposite implements UI {
       ui.onHierachyChanged(cb)
     })
   }
+  onObjectSelect(cb: (id: string) => void): void {
+    this._uis.forEach((ui) => {
+      ui.onObjectSelect(cb)
+    })
+  }
 }
 
 class UIImp implements UI {
@@ -143,9 +158,7 @@ class UIImp implements UI {
   constructor(appThree: App3D) {
     this._appThree = appThree
   }
-  onObjectSelect(cb: (id: string) => void): void {
-    cb('')
-  }
+  onObjectSelect(): void {}
   initiate() {
     this._appThree.initiate()
   }
@@ -157,9 +170,7 @@ class ModelSceneUI implements UI {
   constructor(modelScene: ModelScene) {
     this._modelScene = modelScene
   }
-  onObjectSelect(cb: (id: string) => void): void {
-    cb('')
-  }
+  onObjectSelect(): void {}
   initiate() {}
   onHierachyChanged(cb: HierarchyChangedCallback) {
     this._modelScene.onHierachyChanged(cb)

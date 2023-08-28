@@ -6,14 +6,21 @@ import type { Node } from './components/SceneHierarchy.vue'
 let app3dCanvas = ref<HTMLCanvasElement | null>(null)
 
 let hierarchy = ref<Node[]>([])
+let selecteds = ref<string[]>([])
 
 onMounted(() => {
   if (app3dCanvas.value) {
     let app3d = createApp3D(app3dCanvas.value)
     app3d.initiate()
     app3d.onHierachyChanged((h) => {
-      console.log(hierarchy.value)
       hierarchy.value = h
+    })
+    app3d.onObjectSelect((id) => {
+      if (id) {
+        selecteds.value = [id]
+      } else {
+        selecteds.value = []
+      }
     })
   }
 })
@@ -22,7 +29,7 @@ onMounted(() => {
 <template>
   <div class="editor3d">
     <canvas ref="app3dCanvas" class="app-3d"></canvas>
-    <SceneHierarchy :data="hierarchy"></SceneHierarchy>
+    <SceneHierarchy :data="hierarchy" :selecteds="selecteds"></SceneHierarchy>
   </div>
 </template>
 

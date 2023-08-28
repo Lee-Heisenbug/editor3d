@@ -11,8 +11,8 @@
           children: 'children'
         }"
         :tree-data="data"
+        :selectedKeys="selecteds"
         default-expand-all
-        @select="emitSelect"
       />
     </div>
   </div>
@@ -27,11 +27,8 @@ export interface Node {
 
 defineProps<{
   data: Node[]
+  selecteds: string[]
 }>()
-
-function emitSelect(selecteds: string[]) {
-  console.log(selecteds)
-}
 </script>
 
 <style scoped>
