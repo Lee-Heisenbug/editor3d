@@ -13,6 +13,7 @@
         :tree-data="data"
         :selectedKeys="selecteds"
         default-expand-all
+        @select="emitSelect"
       />
     </div>
   </div>
@@ -29,6 +30,14 @@ defineProps<{
   data: Node[]
   selecteds: string[]
 }>()
+
+let emit = defineEmits<{
+  select: [selectedKeys: string[]]
+}>()
+
+function emitSelect(selectedKeys: string[]) {
+  emit('select', selectedKeys)
+}
 </script>
 
 <style scoped>

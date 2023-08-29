@@ -36,7 +36,7 @@ export function createApp3D(canvas: HTMLCanvasElement): UI {
   const cameraControl = new CameraControlImp()
 
   const selection = new ObjectSelectionInitiator()
-  const selector = new ObjectSelectorImp()
+  const selector = new ObjectSelectorImp(scene)
   const objectBox = new Box3()
   const transforming = new Transforming(selector, selection, objectBox)
 
@@ -68,7 +68,10 @@ export function createApp3D(canvas: HTMLCanvasElement): UI {
               })
             },
             initiate: () => {},
-            onHierachyChanged: () => {}
+            onHierachyChanged: () => {},
+            selectObject: function (id: string): void {
+              selector.selectFromScene(id)
+            }
           })
         },
         (infra) => {
@@ -125,13 +128,19 @@ type Node = {
 
 type HierarchyChangedCallback = (hierarchy: Node[]) => void
 
-interface UI {
+export interface UI {
   initiate(): void
   onHierachyChanged(cb: HierarchyChangedCallback): void
   onObjectSelect(cb: (id: string | null) => void): void
+  selectObject(id: string): void
 }
 
 class UIComposite implements UI {
+  selectObject(id: string): void {
+    this._uis.forEach((ui) => {
+      ui.selectObject(id)
+    })
+  }
   private _uis: UI[] = []
   add(ui: UI) {
     this._uis.push(ui)
@@ -146,7 +155,7 @@ class UIComposite implements UI {
       ui.onHierachyChanged(cb)
     })
   }
-  onObjectSelect(cb: (id: string) => void): void {
+  onObjectSelect(cb: (id: string | null) => void): void {
     this._uis.forEach((ui) => {
       ui.onObjectSelect(cb)
     })
@@ -158,6 +167,7 @@ class UIImp implements UI {
   constructor(appThree: App3D) {
     this._appThree = appThree
   }
+  selectObject(): void {}
   onObjectSelect(): void {}
   initiate() {
     this._appThree.initiate()
@@ -170,6 +180,7 @@ class ModelSceneUI implements UI {
   constructor(modelScene: ModelScene) {
     this._modelScene = modelScene
   }
+  selectObject(): void {}
   onObjectSelect(): void {}
   initiate() {}
   onHierachyChanged(cb: HierarchyChangedCallback) {

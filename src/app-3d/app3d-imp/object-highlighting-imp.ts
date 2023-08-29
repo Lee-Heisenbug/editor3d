@@ -1,9 +1,14 @@
-import { Object3D, Box3Helper, type Event } from 'three'
+import { Object3D, Box3Helper, type Event, Scene } from 'three'
 import type { BoundingBox, ObjectSelectCallback, ObjectSelector } from '../ObjectHighlighting'
 import type { ObjectSelection } from '../ObjectSelection'
 
 export class ObjectSelectorImp implements ObjectSelector {
   private _selectCallbacks: ObjectSelectCallback[] = []
+  private _scene: Scene
+
+  constructor(scene: Scene) {
+    this._scene = scene
+  }
 
   onObjectSelect(cb: (object: Object3D<Event> | null) => void): void {
     this._selectCallbacks.push(cb)
@@ -14,6 +19,14 @@ export class ObjectSelectorImp implements ObjectSelector {
       this._selectCallbacks.forEach((cb) => {
         cb(obj)
       })
+    })
+  }
+
+  selectFromScene(id: string) {
+    const obj = this._scene.getObjectByProperty('uuid', id)
+
+    this._selectCallbacks.forEach((cb) => {
+      cb(obj ? obj : null)
     })
   }
 }
