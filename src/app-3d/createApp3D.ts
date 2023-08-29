@@ -6,7 +6,7 @@ import {
   Scene as SceneThree,
   WebGLRenderer
 } from 'three'
-import { App3D, type ModelLoader } from './App3D'
+import { App3D as App3DConcrete, type ModelLoader } from './App3D'
 import { GLTFModelLoader } from './app3d-imp/GLTFModelLoader'
 import { RendererAndCameraResizer } from './app3d-imp/RendererAndCameraResizer'
 import { CameraControlImp } from './app3d-imp/CameraControlImp'
@@ -22,7 +22,7 @@ import { InitFuncInitiator } from './app3d-imp/InitFuncInitiator'
 import { ObjectHighlighting } from './ObjectHighlighting'
 import { BoundingBoxThree, ObjectSelectorImp } from './app3d-imp/object-highlighting-imp'
 
-export function createApp3D(canvas: HTMLCanvasElement): UI {
+export function createApp3D(canvas: HTMLCanvasElement): App3D {
   const scene = new SceneThree()
   const renderer = new WebGLRenderer({
     canvas
@@ -42,9 +42,9 @@ export function createApp3D(canvas: HTMLCanvasElement): UI {
 
   let modelScene: ModelScene
 
-  const ui = new UIComposite()
+  const app3D = new App3DComposite()
 
-  const appThree = new App3D(
+  const appThree = new App3DConcrete(
     scene,
     camera,
     renderer,
@@ -57,22 +57,22 @@ export function createApp3D(canvas: HTMLCanvasElement): UI {
       new InitFuncInitiator([
         () => {
           selector.setObjectSelection(selection.objectSelection)
-          ui.add({
-            onObjectSelect(cb) {
-              selector.onObjectSelect((object) => {
-                if (object) {
-                  cb(object.uuid)
-                } else {
-                  cb(null)
-                }
-              })
-            },
-            initiate: () => {},
-            onHierachyChanged: () => {},
-            selectObject: function (id: string): void {
-              selector.selectFromScene(id)
-            }
-          })
+          app3D.add(
+            new App3DOptionalImp({
+              onObjectSelect(cb) {
+                selector.onObjectSelect((object) => {
+                  if (object) {
+                    cb(object.uuid)
+                  } else {
+                    cb(null)
+                  }
+                })
+              },
+              selectObject: function (id: string): void {
+                selector.selectFromScene(id)
+              }
+            })
+          )
         },
         (infra) => {
           const gltfLoader = new GLTFLoader()
@@ -80,7 +80,7 @@ export function createApp3D(canvas: HTMLCanvasElement): UI {
 
           modelScene = new ModelScene(infra.scene)
 
-          ui.add(new ModelSceneUI(modelScene))
+          app3D.add(new ModelSceneUI(modelScene))
 
           modelLoader.load((model) => {
             modelScene.add(model)
@@ -115,9 +115,9 @@ export function createApp3D(canvas: HTMLCanvasElement): UI {
     ])
   )
 
-  ui.add(new UIImp(appThree))
+  app3D.add(new App3DImp(appThree))
 
-  return ui
+  return app3D
 }
 
 type Node = {
@@ -128,43 +128,65 @@ type Node = {
 
 type HierarchyChangedCallback = (hierarchy: Node[]) => void
 
-export interface UI {
+export interface App3D {
   initiate(): void
   onHierachyChanged(cb: HierarchyChangedCallback): void
   onObjectSelect(cb: (id: string | null) => void): void
   selectObject(id: string): void
 }
 
-class UIComposite implements UI {
+class App3DComposite implements App3D {
   selectObject(id: string): void {
-    this._uis.forEach((ui) => {
-      ui.selectObject(id)
+    this._app3Ds.forEach((app3D) => {
+      app3D.selectObject(id)
     })
   }
-  private _uis: UI[] = []
-  add(ui: UI) {
-    this._uis.push(ui)
+  private _app3Ds: App3D[] = []
+  add(app3D: App3D) {
+    this._app3Ds.push(app3D)
   }
   initiate(): void {
-    this._uis.forEach((ui) => {
-      ui.initiate()
+    this._app3Ds.forEach((app3D) => {
+      app3D.initiate()
     })
   }
   onHierachyChanged(cb: HierarchyChangedCallback): void {
-    this._uis.forEach((ui) => {
-      ui.onHierachyChanged(cb)
+    this._app3Ds.forEach((app3D) => {
+      app3D.onHierachyChanged(cb)
     })
   }
   onObjectSelect(cb: (id: string | null) => void): void {
-    this._uis.forEach((ui) => {
-      ui.onObjectSelect(cb)
+    this._app3Ds.forEach((app3D) => {
+      app3D.onObjectSelect(cb)
     })
   }
 }
 
-class UIImp implements UI {
-  private _appThree: App3D
-  constructor(appThree: App3D) {
+type OptionalApp3D = {
+  [Property in keyof App3D]?: App3D[Property]
+}
+class App3DOptionalImp implements App3D {
+  private _optionalApp3D: OptionalApp3D
+  constructor(optionalApp3D: OptionalApp3D) {
+    this._optionalApp3D = optionalApp3D
+  }
+  selectObject(id: string): void {
+    this._optionalApp3D.selectObject?.(id)
+  }
+  initiate(): void {
+    this._optionalApp3D.initiate?.()
+  }
+  onHierachyChanged(cb: HierarchyChangedCallback): void {
+    this._optionalApp3D.onHierachyChanged?.(cb)
+  }
+  onObjectSelect(cb: (id: string | null) => void): void {
+    this._optionalApp3D.onObjectSelect?.(cb)
+  }
+}
+
+class App3DImp implements App3D {
+  private _appThree: App3DConcrete
+  constructor(appThree: App3DConcrete) {
     this._appThree = appThree
   }
   selectObject(): void {}
@@ -175,7 +197,7 @@ class UIImp implements UI {
   onHierachyChanged() {}
 }
 
-class ModelSceneUI implements UI {
+class ModelSceneUI implements App3D {
   private _modelScene: ModelScene
   constructor(modelScene: ModelScene) {
     this._modelScene = modelScene

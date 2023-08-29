@@ -11,11 +11,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { createApp3D, type UI } from './app-3d/createApp3D'
+import { createApp3D, type App3D } from './app-3d/createApp3D'
 import SceneHierarchy from './components/SceneHierarchy.vue'
 import type { Node } from './components/SceneHierarchy.vue'
 let app3dCanvas = ref<HTMLCanvasElement | null>(null)
-let app3d: UI
+let app3d: App3D
 let hierarchy = ref<Node[]>([])
 let selecteds = ref<string[]>([])
 
