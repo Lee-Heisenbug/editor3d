@@ -1,5 +1,5 @@
 import type { PerspectiveCamera, WebGLRenderer } from 'three'
-import type { Resizer, Size } from '../App3D'
+import type { Resizer, Size } from '../Resizing'
 
 export class RendererAndCameraResizer implements Resizer {
   private _renderer: WebGLRenderer
