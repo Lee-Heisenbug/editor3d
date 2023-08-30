@@ -21,6 +21,7 @@ import { MouseConflictResolving } from './app3d-imp/MouseConflictResolving'
 import { InitFuncInitiator } from './app3d-imp/InitFuncInitiator'
 import { ObjectHighlighting } from './ObjectHighlighting'
 import { BoundingBoxThree, ObjectSelectorImp } from './app3d-imp/object-highlighting-imp'
+import { Resizing } from './Resizing'
 
 export function createApp3D(canvas: HTMLCanvasElement): App3D {
   const scene = new SceneThree()
@@ -32,7 +33,6 @@ export function createApp3D(canvas: HTMLCanvasElement): App3D {
   const modelLoaderMock: ModelLoader = {
     load() {}
   }
-  const resizer = new RendererAndCameraResizer(renderer, camera)
   const cameraControl = new CameraControlImp()
 
   const selection = new ObjectSelectionInitiator()
@@ -49,12 +49,15 @@ export function createApp3D(canvas: HTMLCanvasElement): App3D {
     camera,
     renderer,
     modelLoaderMock,
-    resizer,
     cameraControl,
     new InitiatorComposite([
       new GridAdder(),
       selection,
       new InitFuncInitiator([
+        function initResizing(infra) {
+          const resizer = new RendererAndCameraResizer(infra.renderer, infra.camera)
+          new Resizing(resizer).initiate()
+        },
         () => {
           selector.setObjectSelection(selection.objectSelection)
           app3D.add(

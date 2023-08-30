@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest'
 import { App3D } from '../App3D'
-import type { CameraControl, ModelLoader, Resizer, Size, Initiator, Infra } from '../App3D'
+import type { CameraControl, ModelLoader, Initiator, Infra } from '../App3D'
 import { AmbientLight, Camera, Object3D, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
 
 class ModelLoaderTest implements ModelLoader {
@@ -13,13 +13,6 @@ class ModelLoaderTest implements ModelLoader {
     this.loadedCall = () => {
       cb(this.loadedModel)
     }
-  }
-}
-
-class ResizerTest implements Resizer {
-  size: Size | null = null
-  setSize(size: Size) {
-    this.size = size
   }
 }
 
@@ -48,11 +41,10 @@ renderer.domElement = document.createElement('canvas')
 const scene = new Scene()
 const camera = new PerspectiveCamera()
 const modelLoader = new ModelLoaderTest()
-const resizer = new ResizerTest()
 const cameraControl = new CameraControlTest()
 const initiator = new InitiatorTest()
 
-const app = new App3D(scene, camera, renderer, modelLoader, resizer, cameraControl, initiator)
+const app = new App3D(scene, camera, renderer, modelLoader, cameraControl, initiator)
 
 describe('initiating', () => {
   const rendererSpy = vi.spyOn(renderer, 'setAnimationLoop')
@@ -69,28 +61,6 @@ describe('initiating', () => {
 
     loopCallback()
     expect(renderer.render).toHaveBeenCalledWith(scene, camera)
-  })
-
-  describe('resizing', () => {
-    it('should resize on initiation', () => {
-      expect(resizer.size).toEqual({
-        width: window.innerWidth,
-        height: window.innerHeight
-      })
-    })
-
-    it('should also resize when window resize', () => {
-      const newSize = [1920, 1080]
-
-      ;[window.innerWidth, window.innerHeight] = newSize
-
-      window.dispatchEvent(new CustomEvent('resize'))
-
-      expect(resizer.size).toEqual({
-        width: window.innerWidth,
-        height: window.innerHeight
-      })
-    })
   })
 
   describe('constructing scene', () => {

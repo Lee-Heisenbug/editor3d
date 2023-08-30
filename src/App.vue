@@ -46,11 +46,19 @@ function selectInApp3D(selectedKeys: string[]) {
   position: fixed;
   top: 0;
   left: 0;
+  height: 100%;
+  width: 100%;
 }
 
 .editor3d .editor3d-card {
   position: fixed;
   top: 0;
   left: 0;
+}
+
+.editor3d .app-3d {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 </style>

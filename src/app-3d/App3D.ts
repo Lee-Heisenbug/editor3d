@@ -4,10 +4,6 @@ export interface ModelLoader {
   load(cb: (model: Object3D) => void): void
 }
 
-export interface Resizer {
-  setSize(size: Size): void
-}
-
 export interface CameraControl {
   initiate(camera: Camera, dom: HTMLElement): void
 }
@@ -32,7 +28,6 @@ export class App3D {
   private _camera: PerspectiveCamera
   private _renderer: WebGLRenderer
   private _modelLoader: ModelLoader
-  private _resizer: Resizer
   private _cameraControl: CameraControl
   private _initiator: Initiator
 
@@ -41,7 +36,6 @@ export class App3D {
     camera: PerspectiveCamera,
     renderer: WebGLRenderer,
     modelLoader: ModelLoader,
-    resizer: Resizer,
     cameraControl: CameraControl,
     initiator: Initiator
   ) {
@@ -49,7 +43,6 @@ export class App3D {
     this._camera = camera
     this._renderer = renderer
     this._modelLoader = modelLoader
-    this._resizer = resizer
     this._cameraControl = cameraControl
     this._initiator = initiator
   }
@@ -58,8 +51,6 @@ export class App3D {
     this._renderer.setAnimationLoop(() => {
       this._renderer.render(this._scene, this._camera)
     })
-
-    this._initResizing()
 
     this._constructScene()
 
@@ -71,21 +62,6 @@ export class App3D {
       scene: this._scene,
       camera: this._camera,
       renderer: this._renderer
-    })
-  }
-
-  private _initResizing() {
-    this._resize()
-
-    window.addEventListener('resize', () => {
-      this._resize()
-    })
-  }
-
-  private _resize() {
-    this._resizer.setSize({
-      width: window.innerWidth,
-      height: window.innerHeight
     })
   }
 
