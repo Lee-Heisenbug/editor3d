@@ -4,15 +4,14 @@ import {
   Object3D,
   PerspectiveCamera,
   Scene as SceneThree,
-  WebGLRenderer
+  WebGLRenderer,
+  LoaderUtils,
+  LoadingManager,
 } from 'three'
 import { App3D as App3DConcrete, type ModelLoader } from './App3D'
-import { GLTFModelLoader } from './app3d-imp/GLTFModelLoader'
 import { RendererAndCameraResizer } from './app3d-imp/RendererAndCameraResizer'
 import { CameraControlImp } from './app3d-imp/CameraControlImp'
-import carModelSrc from './mp44.glb'
-import garageModelSrc from './garage.glb'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { GridAdder } from './app3d-imp/GridAdder'
 import { InitiatorComposite } from './app3d-imp/InitiatorComposite'
 import { ObjectSelectionInitiator } from './app3d-imp/ObjectSelectionInitiator'
@@ -58,6 +57,148 @@ export function createApp3D(canvas: HTMLCanvasElement): App3D {
           const resizer = new RendererAndCameraResizer(infra.renderer, infra.camera)
           new Resizing(resizer).initiate()
         },
+        function initSceneTreeUI(infra) {
+
+          modelScene = new ModelScene(infra.scene)
+
+          app3D.add(new ModelSceneUI(modelScene))
+
+        },
+        function initDropFile({renderer}) {
+
+          const MANAGER = new LoadingManager();
+
+          class DropFileInitiator {
+
+            private _dom: HTMLElement
+            private _scene: ModelScene
+
+            constructor( dom: HTMLElement, scene: ModelScene ) {
+
+              this._dom = dom;
+              this._scene = scene;
+
+            }
+            init() {
+
+              this._whenFilesDrop(( files: File[] ) => {
+
+                const fileMap = new Map(files.map((file) => [file.name, file]));
+
+                let rootFile: File | string = '';
+                let rootPath = '';
+                Array.from(fileMap).forEach(([path, file]) => {
+                  if (file.name.match(/\.(gltf|glb)$/)) {
+                    rootFile = file;
+                    rootPath = path.replace(file.name, '');
+                  }
+                });
+
+                this._parseFiles(rootFile, rootPath, fileMap);
+                
+              })
+
+            }
+
+            private _whenFilesDrop( cb: ( files: File[] ) => void) {
+
+              this._dom.addEventListener('drop', (e) => {
+                e.preventDefault();
+
+                if( e.dataTransfer ) {
+
+                  cb( Array.from(e.dataTransfer.files) );
+
+                }
+
+              })
+
+              this._dom.addEventListener('dragover', e => {
+                e.preventDefault();
+              })
+
+            }
+
+            /**
+             * Passes a model to the viewer, given file and resources.
+             */
+            private _parseFiles(rootFile: File|string, rootPath: string, fileMap: Map<string, File>) {
+
+              const fileURL = typeof rootFile === 'string' ? rootFile : URL.createObjectURL(rootFile);
+
+              this._loadGLTF(fileURL, rootPath, fileMap)
+                .then((gltf) => {
+
+                  this._addModelToScene( gltf.scene)
+
+                });
+            }
+
+            private _loadGLTF(url: string, rootPath:string, assetMap: Map<string, File>): Promise< GLTF > {
+              const baseURL = LoaderUtils.extractUrlBase(url);
+          
+              // Load.
+              return new Promise((resolve, reject) => {
+                // Intercept and override relative URLs.
+                MANAGER.setURLModifier((url) => {
+                  // URIs in a glTF file may be escaped, or not. Assume that assetMap is
+                  // from an un-escaped source, and decode all URIs before lookups.
+                  // See: https://github.com/donmccurdy/three-gltf-viewer/issues/146
+                  const normalizedURL =
+                    rootPath +
+                    decodeURI(url)
+                      .replace(baseURL, '')
+                      .replace(/^(\.?\/)/, '');
+          
+                  if (assetMap.has(normalizedURL)) {
+                    const blob = assetMap.get(normalizedURL);
+                    const blobURL = URL.createObjectURL(<File>blob);
+                    blobURLs.push(blobURL);
+                    return blobURL;
+                  }
+          
+                  return url;
+                });
+          
+                const loader = new GLTFLoader(MANAGER)
+                  .setCrossOrigin('anonymous')
+          
+                const blobURLs: string[] = [];
+          
+                loader.load(
+                  url,
+                  (gltf) => {
+          
+                    const scene = gltf.scene || gltf.scenes[0];
+          
+                    if (!scene) {
+                      throw new Error(
+                        'This model contains no scene, and cannot be viewed here. However,' +
+                          ' it may contain individual 3D resources.',
+                      );
+                    }
+          
+                    blobURLs.forEach(URL.revokeObjectURL);
+          
+                    resolve(gltf);
+                  },
+                  undefined,
+                  reject,
+                );
+              });
+            }
+
+            private _addModelToScene( scene: Object3D ) {
+
+              this._scene.add( scene )
+              
+            }
+
+          }
+
+          (new DropFileInitiator( renderer.domElement, modelScene )).init();
+
+        },
         () => {
           selector.setObjectSelection(selection.objectSelection)
           app3D.add(
@@ -76,18 +217,6 @@ export function createApp3D(canvas: HTMLCanvasElement): App3D {
               }
             })
           )
-        },
-        (infra) => {
-          const gltfLoader = new GLTFLoader()
-          const modelLoader = new GLTFModelLoader([carModelSrc, garageModelSrc], gltfLoader)
-
-          modelScene = new ModelScene(infra.scene)
-
-          app3D.add(new ModelSceneUI(modelScene))
-
-          modelLoader.load((model) => {
-            modelScene.add(model)
-          })
         },
         (infra) => {
           class IntersectionIgnoreWrapper extends Object3D {
