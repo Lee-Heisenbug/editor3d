@@ -1,20 +1,7 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest'
 import { App3D } from '../App3D'
-import type { CameraControl, ModelLoader, Initiator, Infra } from '../App3D'
-import { AmbientLight, Camera, Object3D, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
-
-class ModelLoaderTest implements ModelLoader {
-  loadedModel = new Object3D()
-  loadedCall = () => {}
-
-  constructor() {}
-
-  load(cb: (model: Object3D) => void) {
-    this.loadedCall = () => {
-      cb(this.loadedModel)
-    }
-  }
-}
+import type { CameraControl, Initiator, Infra } from '../App3D'
+import { AmbientLight, Camera, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
 
 class CameraControlTest implements CameraControl {
   camera: Camera | null = null
@@ -40,11 +27,10 @@ const renderer = new WebGLRenderer()
 renderer.domElement = document.createElement('canvas')
 const scene = new Scene()
 const camera = new PerspectiveCamera()
-const modelLoader = new ModelLoaderTest()
 const cameraControl = new CameraControlTest()
 const initiator = new InitiatorTest()
 
-const app = new App3D(scene, camera, renderer, modelLoader, cameraControl, initiator)
+const app = new App3D(scene, camera, renderer, cameraControl, initiator)
 
 describe('initiating', () => {
   const rendererSpy = vi.spyOn(renderer, 'setAnimationLoop')
@@ -66,17 +52,6 @@ describe('initiating', () => {
   describe('constructing scene', () => {
     it('should has an ambient light', () => {
       expect((<AmbientLight>sceneSpy.mock.calls[0][0]).isAmbientLight).toBe(true)
-    })
-  })
-
-  describe('loading model', () => {
-    beforeAll(() => {
-      sceneSpy.mockClear()
-      modelLoader.loadedCall()
-    })
-
-    it('should add loadded model to scene when model loaded', () => {
-      expect(sceneSpy).toHaveBeenCalledWith(modelLoader.loadedModel)
     })
   })
 
